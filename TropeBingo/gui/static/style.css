@@ -1,7 +1,11 @@
 body {
-    background-color: #c9fcc3;
+    background-color: #8edbb3;
 }
 
+.cart-title{
+    text-decoration-color: #8edbb3;
+    font-size: large;
+}
 #content {
     width: 600px;
     max-width: 100%;

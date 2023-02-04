@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
-
+from django.contrib.auth.forms import AuthenticationForm
 from base.forms import RegisterUserForm
 
 
@@ -28,3 +28,4 @@ def register(request):
 @login_required(login_url='/login')
 def default(request):
     return render(request, 'default.html')
+

@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Login</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-    <a class="float-right" href="/register">Register</a>
-  </form>
+    <h5 class="card-title text-blue">Login</h5>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button type="submit" class="btn btn-primary">Login</button>
+        <a href="/register" class="btn btn-dark">...or register</a>
+        </div>
+    </form>
 {% endblock %}
