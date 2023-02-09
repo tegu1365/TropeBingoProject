@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_bootstrap5',
+    'bootstrap5',
     'gui'
 ]
 
@@ -123,7 +123,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGOUT_REDIRECT_URL = '/'
-LOGIN_REDIRECT_URL = '/default'
+LOGIN_REDIRECT_URL = '/profile/'
 
 
 # Email confirm

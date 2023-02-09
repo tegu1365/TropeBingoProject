@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Profile Page{% endblock title %}
+{% block content %}
+    <div class="row my-3 p-3">
+        <h5 class="card-title">{{user.username}}</h5>
+        <p>First name: {{ user.first_name }}</p>
+        <p>Last name: {{ user.last_name }}</p>
+    </div>
+    <br/>
+    <div>
+    Bingo sheets:
+    </div>
+{% endblock content %}

@@ -3,18 +3,57 @@
 <html lang="en">
 <head>
     <title>Trope Bingo</title>
-    {% load django_bootstrap5 %}
+    {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     {% bootstrap_messages %}
-    <link rel="stylesheet" href="{% static 'style.css' %}" />
+     <link rel="stylesheet" href="{% static 'style.css' %}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body class="bg-light">
-    <div id="content" class="card">
-        <div class="card-body">
-        {% block content %}{% endblock %}
+<div id="content" class="card">
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #baefd1;">
+        <a class="navbar-brand" href="/default">Trope Bingo</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+                {% if not user.is_authenticated %}
+                    <lu class="nav" >
+                    <li class="nav-item ">
+                        <a class="nav-link {% if url_name == 'register' %}active{% endif %}" href="/register">Register</a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link {% if url_name == 'login' %}active{% endif %}" href="/login">
+                            Log-in
+                        </a>
+                    </li>
+                    </lu>
+                {% endif %}
+
+            {% if user.is_authenticated %}
+                <lu class="nav">
+                <li class="nav-item ">
+                    <a class="nav-link {% if url_name == 'default' %}active{% endif %}" href="/default">Home</a>
+                </li>
+                 <li class="nav-item ">
+                     <a class="nav-link {% if url_name == 'profile/' %}active{% endif %}" href="/profile/">Profile</a>
+                 </li>
+                <li class="nav-item ">
+                    <a class="nav-link {% if url_name == '#' %}active{% endif %}" href="#">New Bingo</a>
+                </li>
+                 <li class="nav-item">
+                    <a class="nav-link  {% if url_name == 'logout' %}active{% endif %}" href="/logout">Log out</a>
+                 </li>
+                 </lu>
+            {% endif %}
         </div>
+    </nav>
+    <div class="card-body">
+        {% block content %}{% endblock %}
     </div>
+</div>
 </body>
 </html>

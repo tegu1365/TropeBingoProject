@@ -29,3 +29,7 @@ def register(request):
 def default(request):
     return render(request, 'default.html')
 
+
+@login_required(login_url='/login')
+def profile(request):
+    return render(request, 'registration/profile.html')

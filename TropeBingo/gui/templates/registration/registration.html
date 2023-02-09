@@ -1,6 +1,6 @@
 
 {% extends "base.html" %}
-{% load django_bootstrap5 %}
+{% load bootstrap5 %}
 
 {% block content %}
 <h5 class="card-title">Sigh up</h5>
@@ -8,7 +8,7 @@
     {% csrf_token %}
     {% bootstrap_form form %}
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <button type="submit" class="btn btn-primary">Register</button>
+      <button type="submit" class="btn btn-light" style="background-color: #baefd1;">Register</button>
       <a href="/login" class="btn btn-dark">...or log in</a>
     </div>
   </form>

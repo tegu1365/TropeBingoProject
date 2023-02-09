@@ -2,6 +2,13 @@ body {
     background-color: #8edbb3;
 }
 
+.navbar{
+    background-color: #baefd1;
+    margin:20px auto;
+    padding: 20px;
+    border: 1px solid rgb(0, 0, 0);
+}
+
 .cart-title{
     text-decoration-color: #8edbb3;
     font-size: large;
@@ -12,11 +19,16 @@ body {
     margin: 20px auto;
     padding: 20px;
     background-color: #EFEFEF;
-    border: 1px solid black;
+    border: 5px solid black;
     border-radius: 10px;
     box-shadow: 0px 0px 5px 0px black;
 }
 
 .float-right {
     float: right;
+}
+
+.nav-item a:active{
+    background-color: #49936a;
+    color: ghostwhite;
 }
