@@ -9,5 +9,11 @@
     <br/>
     <div>
     Bingo sheets:
+   <div class="list">
+        {% for bingo in BingoSheet %}
+            <div class="list-item">{{ bingo.name }}</div>
+             <!--<a href="bingo?id={{ bingo.pk }}" class="list-item">{{ bingo.name }}</a>-->
+        {% endfor %}
+    </div>
     </div>
 {% endblock content %}

@@ -8,5 +8,6 @@ urlpatterns = [
     path('logout', auth_views.LogoutView.as_view()),
     path('default', views.default),
     path('register', views.register),
-    path('profile/', views.profile, name='users-profile'),
+    path('profile', views.profile),
+    path('newbingo', views.create_bingo)
 ]

@@ -20,9 +20,14 @@ class TropeAdmin(admin.ModelAdmin):
     ordering = ('name',)
     search_fields = ('name',)
     filter_horizontal = ('genres',)
-    list_display = ('name', 'description','display_genres')
-    fields = ('name', 'description')
+    list_display = ('name', 'description', 'display_genres')
+    fields = ('name', 'description', 'genres')
     inlines = [GenreInline]
+
+    def formfield_for_genre(self, db_field, request, **kwargs):
+        if db_field.name == 'genres':
+            kwargs['queryset'] = Genre.objects.order_by('name')
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     def display_genres(self, obj):
         return ', '.join([genre.name for genre in obj.genres.all()])
@@ -32,10 +37,10 @@ class TropeAdmin(admin.ModelAdmin):
 
 class BingoSheetAdmin(admin.ModelAdmin):
     model = BingoSheet
-    ordering = ('name', 'owner')
-    search_fields = ('name',)
-    list_display = ('name', 'owner', 'code', 'checked', 'private')
-    fields = ('name', 'owner', 'code', 'checked', 'private')
+    ordering = ('name', 'owner', 'genre')
+    search_fields = ('name', 'genre')
+    list_display = ('name', 'owner', 'code', 'checked', 'private', 'genre')
+    fields = ('name', 'owner', 'code', 'checked', 'private', 'genre')
 
 
 admin.site.register(Genre, GenreAdmin)
