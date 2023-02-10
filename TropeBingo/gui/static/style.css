@@ -30,5 +30,5 @@ body {
 
 .nav-item a:active{
     background-color: #49936a;
-    color: ghostwhite;
+    text-decoration-color: ghostwhite;
 }
