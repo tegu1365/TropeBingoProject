@@ -9,5 +9,6 @@ urlpatterns = [
     path('default', views.default),
     path('register', views.register),
     path('profile', views.profile),
-    path('newbingo', views.create_bingo)
+    path('newbingo', views.create_bingo),
+    path('bingo', views.bingo)
 ]

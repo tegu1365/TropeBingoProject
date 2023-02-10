@@ -1,6 +1,7 @@
 import random
 
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
@@ -68,3 +69,30 @@ def create_bingo(request):
     else:
         form = BingoForm()
     return render(request, 'create_bingo.html', {'form': form})
+
+
+def getTropes(code):
+    code_splited = code.split("|")
+    trope_ids = [int(i) for i in code_splited[:len(code_splited)-1]]
+    tropes =[]
+    for i in trope_ids:
+        tropes.append(Trope.objects.get(pk=i))
+
+    table_of_tropes = []
+    for i in range(0, len(tropes), 5):
+        table_of_tropes.append(tropes[i:i + 5])
+    return table_of_tropes
+
+
+@login_required(login_url='/login')
+def bingo(request):
+    try:
+        bingoSheet = BingoSheet.objects.get(pk=request.GET['id'])
+    except (KeyError, BingoSheet.DoesNotExist):
+        return HttpResponseNotFound('Invalid link. No ID found.')
+    context = {
+        'name': bingoSheet.name,
+        'private': bingoSheet.private,
+        'tropes': getTropes(bingoSheet.code)
+    }
+    return render(request, 'bingo.html', context)

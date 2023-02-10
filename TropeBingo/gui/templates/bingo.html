@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h5 class="header">{{ name }}</h5>
+    {% if private %}
+        <p>This is Private bingo.</p>
+    {% endif %}
+    <hr/>
+    <table class="table table-bordered border-dark">
+        <thead style="background-color: #baefd1; text-align: center; font-size: larger;">
+        <tr>
+            <th scope="col" >B</th>
+            <th scope="col">I</th>
+            <th scope="col">N</th>
+            <th scope="col">G</th>
+            <th scope="col">O</th>
+        </tr>
+        </thead>
+        {% for row in tropes %}
+            <tr>
+                {% for trope in row %}
+                    <td>{{ trope.name }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+    <br/>
+    <a href="#" class="btn btn-light" style="background-color: #baefd1; float:right ">Play</a>
+{% endblock %}
