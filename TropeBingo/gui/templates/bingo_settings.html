@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button type="submit" class="btn btn-light" style="background-color: #baefd1;">Save</button>
+</form>
+{% endblock %}

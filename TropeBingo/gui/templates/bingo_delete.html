@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+
+{% block content %}
+    <form action="bingo_delete?id={{ bingo.pk }}" method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to delete {{ bingo.name }}?</p>
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <a href="bingo?id={{ bingo.pk }}" class="btn btn-light" style="background-color: #8edbb3;">Return
+                    to Bingo</a>
+                <button type="submit" class="btn btn-light"
+                        style="background-color: #ff4646; color: #EFEFEF">DELETE
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

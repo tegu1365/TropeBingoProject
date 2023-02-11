@@ -31,3 +31,9 @@ class BingoForm(forms.ModelForm):
     class Meta:
         model = BingoSheet
         fields = ['name', 'private', 'genre', 'code', 'checked']
+
+
+class BingoSettingsForm(forms.ModelForm):
+    class Meta:
+        model = BingoSheet
+        fields = ['name', 'private']

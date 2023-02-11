@@ -5,7 +5,7 @@ from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
-from base.forms import RegisterUserForm, BingoForm
+from base.forms import RegisterUserForm, BingoForm, BingoSettingsForm
 from gui.models import BingoSheet, Genre, Trope
 
 
@@ -65,7 +65,7 @@ def create_bingo(request):
             bingo_sheet.checked = generate_checked()
             bingo_sheet.owner = request.user
             bingo_sheet.save()
-            return redirect('profile/')
+            return redirect(f'/bingo?id={bingo_sheet.pk}')
     else:
         form = BingoForm()
     return render(request, 'create_bingo.html', {'form': form})
@@ -96,17 +96,17 @@ def getChecked(checked, tropes):
 @login_required(login_url='/login')
 def bingo(request):
     try:
-        bingoSheet = BingoSheet.objects.get(pk=request.GET['id'])
+        bingo_sheet = BingoSheet.objects.get(pk=request.GET['id'])
     except (KeyError, BingoSheet.DoesNotExist):
         return HttpResponseNotFound('Invalid link. No ID found.')
-    tropes = getTropes(bingoSheet.code)
+    tropes = getTropes(bingo_sheet.code)
     context = {
-        'name': bingoSheet.name,
-        'private': bingoSheet.private,
+        'name': bingo_sheet.name,
+        'private': bingo_sheet.private,
         'tropes': tropes,
-        'checked_tropes': getChecked(bingoSheet.checked, bingoSheet.code),
-        'bingo_done': bingoSheet.bingo_done,
-        'bingo': bingoSheet
+        'checked_tropes': getChecked(bingo_sheet.checked, bingo_sheet.code),
+        'bingo_done': bingo_sheet.bingo_done,
+        'bingo': bingo_sheet
     }
     return render(request, 'bingo.html', context)
 
@@ -114,28 +114,56 @@ def bingo(request):
 @login_required(login_url='/login')
 def play_bingo(request):
     try:
-        bingoSheet = BingoSheet.objects.get(pk=request.GET['id'])
+        bingo_sheet = BingoSheet.objects.get(pk=request.GET['id'])
     except (KeyError, BingoSheet.DoesNotExist):
         return HttpResponseNotFound('Invalid link. No ID found.')
-    tropes = getTropes(bingoSheet.code)
+    tropes = getTropes(bingo_sheet.code)
     if request.method == 'POST':
-        bingoSheet.bingo_done = request.POST.get('bingo_done', False)
+        bingo_sheet.bingo_done = request.POST.get('bingo_done', False)
         checked = ''
         for row in tropes:
             for trope in row:
                 checked += '1' if request.POST.get(f'trope_{trope.id}') else '0'
-        bingoSheet.checked = checked
-        bingoSheet.save()
-        return redirect('/profile')
+        bingo_sheet.checked = checked
+        bingo_sheet.save()
+        return redirect(f'/bingo?id={ bingo_sheet.pk }')
 
-    tropes = getTropes(bingoSheet.code)
+    tropes = getTropes(bingo_sheet.code)
 
     context = {
-        'name': bingoSheet.name,
-        'private': bingoSheet.private,
+        'name': bingo_sheet.name,
+        'private': bingo_sheet.private,
         'tropes': tropes,
-        'checked_tropes': getChecked(bingoSheet.checked, bingoSheet.code),
-        'bingo_done': bingoSheet.bingo_done,
-        'bingo': bingoSheet
+        'checked_tropes': getChecked(bingo_sheet.checked, bingo_sheet.code),
+        'bingo_done': bingo_sheet.bingo_done,
+        'bingo': bingo_sheet
     }
     return render(request, 'play_bingo.html', context)
+
+
+@login_required(login_url='/login')
+def bingo_settings(request):
+    try:
+        bingo_sheet = BingoSheet.objects.get(pk=request.GET['id'])
+    except (KeyError, BingoSheet.DoesNotExist):
+        return HttpResponseNotFound('Invalid link. No ID found.')
+
+    if request.method == 'POST':
+        form = BingoSettingsForm(request.POST or None, instance=bingo_sheet)
+        if form.is_valid():
+            form.save()
+            return redirect(f'/bingo?id={bingo_sheet.pk}')
+    else:
+        form = BingoSettingsForm(instance=bingo_sheet)
+    return render(request, 'bingo_settings.html', {'bingo': bingo_sheet, 'form': form})
+
+@login_required(login_url='/login')
+def bingo_delete(request):
+    try:
+        bingo_sheet = BingoSheet.objects.get(pk=request.GET['id'])
+    except (KeyError, BingoSheet.DoesNotExist):
+        return HttpResponseNotFound('Invalid link. No ID found.')
+    if request.method == 'POST':
+        bingo_sheet.delete()
+        return redirect('/profile')
+    return render(request, 'bingo_delete.html', {'bingo': bingo_sheet})

@@ -1,7 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h5 class="header">{{ name }}</h5>
+    <div class="row">
+        <div class="col-8">
+            <h4 class="header">{{ name }}</h4>
+        </div>
+        <div class="col-2">
+            <a href="bingo_settings?id={{ bingo.pk }}" class="btn btn-light"
+               style="background-color: #baefd1; float:right ">Settings</a>
+        </div>
+     <div class="col-2">
+         <a href="bingo_delete?id={{ bingo.pk }}" class="btn btn-light"
+               style="background-color: #ff4646; color: #EFEFEF">DELETE</a>
+     </div>
+    </div>
     {% if private %}
         <p>This is Private bingo.</p>
     {% endif %}
