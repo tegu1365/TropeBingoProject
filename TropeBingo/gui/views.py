@@ -105,12 +105,12 @@ def bingo(request):
         'private': bingoSheet.private,
         'tropes': tropes,
         'checked_tropes': getChecked(bingoSheet.checked, bingoSheet.code),
-        'bingo_done': bingoSheet.bingo_done
+        'bingo_done': bingoSheet.bingo_done,
+        'bingo': bingoSheet
     }
     return render(request, 'bingo.html', context)
 
 
-'''
 @login_required(login_url='/login')
 def play_bingo(request):
     try:
@@ -118,21 +118,24 @@ def play_bingo(request):
     except (KeyError, BingoSheet.DoesNotExist):
         return HttpResponseNotFound('Invalid link. No ID found.')
     tropes = getTropes(bingoSheet.code)
-
     if request.method == 'POST':
+        bingoSheet.bingo_done = request.POST.get('bingo_done', False)
         checked = ''
-        for trope in tropes:
-            checked += '1' if request.POST.get(f'trope_{trope.id}') else '0'
+        for row in tropes:
+            for trope in row:
+                checked += '1' if request.POST.get(f'trope_{trope.id}') else '0'
         bingoSheet.checked = checked
         bingoSheet.save()
-        return redirect('bingo', bingo_sheet_id=bingoSheet.id)
-    
-    checked_tropes = [trope for i, trope in enumerate(tropes) if bingoSheet.checked[i] == '1']
+        return redirect('/profile')
+
+    tropes = getTropes(bingoSheet.code)
+
     context = {
         'name': bingoSheet.name,
         'private': bingoSheet.private,
         'tropes': tropes,
-        'checked_tropes': checked_tropes
+        'checked_tropes': getChecked(bingoSheet.checked, bingoSheet.code),
+        'bingo_done': bingoSheet.bingo_done,
+        'bingo': bingoSheet
     }
     return render(request, 'play_bingo.html', context)
-    '''

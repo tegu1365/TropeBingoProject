@@ -32,6 +32,6 @@
     </table>
     <br/>
     {% if not bingo_done %}
-        <a href="#" class="btn btn-light" style="background-color: #baefd1; float:right ">Play</a>
+        <a href="play_bingo?id={{ bingo.pk }}" class="btn btn-light" style="background-color: #baefd1; float:right ">Play</a>
     {% endif %}
 {% endblock %}

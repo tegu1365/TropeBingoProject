@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h5 class="header">{{ name }}</h5>
+    {% if private %}
+        <p>This is Private bingo.</p>
+    {% endif %}
+    {% if bingo_done %}
+        <h3 style="background-color: #baefd1; text-align: center; font-size: xx-large;">BINGO</h3>
+    {% endif %}
+    <hr/>
+    <form method="post">
+    {% csrf_token %}
+    <table class="table">
+        <thead style="background-color: #baefd1; text-align: center; font-size: xx-large;">
+        <tr>
+            <th scope="col">T</th>
+            <th scope="col">R</th>
+            <th scope="col">O</th>
+            <th scope="col">P</th>
+            <th scope="col">E</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in tropes %}
+            <tr>
+                {% for trope in row %}
+                    <td {% if trope in checked_tropes %}class="checked"
+                        style="color: #EFEFEF; background-color: #1d8a4f; border-bottom-color: black;"{% endif %}>
+                        <label>
+                            <input type="checkbox" name="trope_{{trope.id}}" value="1" {% if trope in checked_tropes %}checked="checked"{% endif %}><span>{{ trope.name }}</span>
+                        </label>
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br/>
+    <input type="checkbox" name="bingo_done" value="1" {% if bingo_done %}checked="checked"{% endif %}><span>BINGO</span>
+    <button type="submit" class="btn btn-light" style="background-color: #baefd1; float:right ">Save</button>
+    </form>
+
+{% endblock %}

@@ -10,5 +10,6 @@ urlpatterns = [
     path('register', views.register),
     path('profile', views.profile),
     path('newbingo', views.create_bingo),
-    path('bingo', views.bingo)
+    path('bingo', views.bingo),
+    path('play_bingo', views.play_bingo)
 ]
