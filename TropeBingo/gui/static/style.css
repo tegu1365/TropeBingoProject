@@ -14,8 +14,8 @@ body {
     font-size: large;
 }
 #content {
-    width: 600px;
-    max-width: 100%;
+    width: 750px;
+    max-width: 80%;
     margin: 20px auto;
     padding: 20px;
     background-color: #EFEFEF;
