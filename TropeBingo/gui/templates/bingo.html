@@ -6,6 +6,9 @@
         <p>This is Private bingo.</p>
     {% endif %}
     <hr/>
+    {% if bingo_done %}
+        <h3 style="background-color: #baefd1; text-align: center; font-size: xxx-large; font-weight: bolder">BINGO</h3>
+    {% endif %}
     <table class="table">
         <thead style="background-color: #baefd1; text-align: center; font-size: xx-large;">
         <tr>
@@ -16,16 +19,19 @@
             <th scope="col">E</th>
         </tr>
         </thead>
-    <tbody class="tbody-border border-dark">
+        <tbody class="tbody-border border-dark">
         {% for row in tropes %}
             <tr class="tr-border border-dark">
                 {% for trope in row %}
-                   <td {% if trope in checked_tropes %}style="background-color: #baefd1;" {% endif %}> {{ trope.name }}</td>
+                    <td {% if trope in checked_tropes %}style="color: #EFEFEF; background-color: #3e7255; border-bottom-color: black;"{% endif %}>
+                        {{ trope.name }}</td>
                 {% endfor %}
             </tr>
         {% endfor %}
-    </tbody>
+        </tbody>
     </table>
     <br/>
-    <a href="#" class="btn btn-light" style="background-color: #baefd1; float:right ">Play</a>
+    {% if not bingo_done %}
+        <a href="#" class="btn btn-light" style="background-color: #baefd1; float:right ">Play</a>
+    {% endif %}
 {% endblock %}

@@ -39,8 +39,8 @@ class BingoSheetAdmin(admin.ModelAdmin):
     model = BingoSheet
     ordering = ('name', 'owner', 'genre')
     search_fields = ('name', 'genre')
-    list_display = ('name', 'owner', 'code', 'checked', 'private', 'genre')
-    fields = ('name', 'owner', 'code', 'checked', 'private', 'genre')
+    list_display = ('name', 'owner', 'code', 'checked', 'private', 'genre', 'bingo_done')
+    fields = ('name', 'owner', 'code', 'checked', 'private', 'genre','bingo_done')
 
 
 admin.site.register(Genre, GenreAdmin)

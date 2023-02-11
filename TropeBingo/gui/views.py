@@ -47,7 +47,7 @@ def generate_code(genre):
     random_tropes = random.sample(list(tropes), min(25, len(tropes)))
     code = ''
     for trope in random_tropes:
-        code += (str(trope.id)+'|')
+        code += (str(trope.id) + '|')
     return code
 
 
@@ -73,8 +73,8 @@ def create_bingo(request):
 
 def getTropes(code):
     code_splited = code.split("|")
-    trope_ids = [int(i) for i in code_splited[:len(code_splited)-1]]
-    tropes =[]
+    trope_ids = [int(i) for i in code_splited[:len(code_splited) - 1]]
+    tropes = []
     for i in trope_ids:
         tropes.append(Trope.objects.get(pk=i))
 
@@ -85,9 +85,9 @@ def getTropes(code):
 
 
 def getChecked(checked, tropes):
-    checked_tropes=[]
+    checked_tropes = []
     tropes_splited = tropes.split("|")
-    for i in range(0, len(tropes_splited)-1):
+    for i in range(0, len(tropes_splited) - 1):
         if checked[i] == '1':
             checked_tropes.append(Trope.objects.get(pk=int(tropes_splited[i])))
     return checked_tropes
@@ -99,14 +99,16 @@ def bingo(request):
         bingoSheet = BingoSheet.objects.get(pk=request.GET['id'])
     except (KeyError, BingoSheet.DoesNotExist):
         return HttpResponseNotFound('Invalid link. No ID found.')
-    tropes=getTropes(bingoSheet.code)
+    tropes = getTropes(bingoSheet.code)
     context = {
         'name': bingoSheet.name,
         'private': bingoSheet.private,
         'tropes': tropes,
-        'checked_tropes': getChecked(bingoSheet.checked, bingoSheet.code)
+        'checked_tropes': getChecked(bingoSheet.checked, bingoSheet.code),
+        'bingo_done': bingoSheet.bingo_done
     }
     return render(request, 'bingo.html', context)
+
 
 '''
 @login_required(login_url='/login')
