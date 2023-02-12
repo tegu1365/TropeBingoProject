@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
-from base.forms import RegisterUserForm, BingoForm, BingoSettingsForm
+from base.forms import RegisterUserForm, BingoForm, BingoSettingsForm, UserForm
 from gui.models import BingoSheet, Genre, Trope
 
 
@@ -13,6 +14,8 @@ def index(request):
     """Welcome page."""
     return render(request, 'index.html')
 
+
+# ------------------------------------USER------------------------------------
 
 def register(request):
     if request.method == "POST":
@@ -26,7 +29,7 @@ def register(request):
     context = {
         'form': form
     }
-    return render(request, 'registration/registration.html', context)
+    return render(request, 'user/registration.html', context)
 
 
 @login_required(login_url='/login')
@@ -39,8 +42,27 @@ def profile(request):
     context = {
         'BingoSheet': BingoSheet.objects.filter(owner=request.user)
     }
-    return render(request, 'registration/profile.html', context)
+    return render(request, 'user/profile.html', context)
 
+
+@login_required(login_url='/login')
+def edit_profile(request):
+    try:
+        user = User.objects.get(pk=request.GET['id'])
+    except (KeyError, User.DoesNotExist):
+        return HttpResponseNotFound('Invalid link. No ID found.')
+
+    if request.method == 'POST':
+        form = UserForm(request.POST or None, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect(f'/profile?id={user.pk}')
+    else:
+        form = UserForm(instance=user)
+    return render(request, 'user/user_edit.html', {'user': user, 'form': form})
+
+
+# ------------------------------------BINGO------------------------------------
 
 def generate_code(genre):
     tropes = Trope.objects.filter(genres=genre)
@@ -68,10 +90,10 @@ def create_bingo(request):
             return redirect(f'/bingo?id={bingo_sheet.pk}')
     else:
         form = BingoForm()
-    return render(request, 'create_bingo.html', {'form': form})
+    return render(request, 'bingo/create_bingo.html', {'form': form})
 
 
-def getTropes(code):
+def get_tropes(code):
     code_splited = code.split("|")
     trope_ids = [int(i) for i in code_splited[:len(code_splited) - 1]]
     tropes = []
@@ -84,7 +106,7 @@ def getTropes(code):
     return table_of_tropes
 
 
-def getChecked(checked, tropes):
+def get_checked(checked, tropes):
     checked_tropes = []
     tropes_splited = tropes.split("|")
     for i in range(0, len(tropes_splited) - 1):
@@ -99,16 +121,16 @@ def bingo(request):
         bingo_sheet = BingoSheet.objects.get(pk=request.GET['id'])
     except (KeyError, BingoSheet.DoesNotExist):
         return HttpResponseNotFound('Invalid link. No ID found.')
-    tropes = getTropes(bingo_sheet.code)
+    tropes = get_tropes(bingo_sheet.code)
     context = {
         'name': bingo_sheet.name,
         'private': bingo_sheet.private,
         'tropes': tropes,
-        'checked_tropes': getChecked(bingo_sheet.checked, bingo_sheet.code),
+        'checked_tropes': get_checked(bingo_sheet.checked, bingo_sheet.code),
         'bingo_done': bingo_sheet.bingo_done,
         'bingo': bingo_sheet
     }
-    return render(request, 'bingo.html', context)
+    return render(request, 'bingo/bingo.html', context)
 
 
 @login_required(login_url='/login')
@@ -117,7 +139,7 @@ def play_bingo(request):
         bingo_sheet = BingoSheet.objects.get(pk=request.GET['id'])
     except (KeyError, BingoSheet.DoesNotExist):
         return HttpResponseNotFound('Invalid link. No ID found.')
-    tropes = getTropes(bingo_sheet.code)
+    tropes = get_tropes(bingo_sheet.code)
     if request.method == 'POST':
         bingo_sheet.bingo_done = request.POST.get('bingo_done', False)
         checked = ''
@@ -126,19 +148,19 @@ def play_bingo(request):
                 checked += '1' if request.POST.get(f'trope_{trope.id}') else '0'
         bingo_sheet.checked = checked
         bingo_sheet.save()
-        return redirect(f'/bingo?id={ bingo_sheet.pk }')
+        return redirect(f'/bingo?id={bingo_sheet.pk}')
 
-    tropes = getTropes(bingo_sheet.code)
+    tropes = get_tropes(bingo_sheet.code)
 
     context = {
         'name': bingo_sheet.name,
         'private': bingo_sheet.private,
         'tropes': tropes,
-        'checked_tropes': getChecked(bingo_sheet.checked, bingo_sheet.code),
+        'checked_tropes': get_checked(bingo_sheet.checked, bingo_sheet.code),
         'bingo_done': bingo_sheet.bingo_done,
         'bingo': bingo_sheet
     }
-    return render(request, 'play_bingo.html', context)
+    return render(request, 'bingo/play_bingo.html', context)
 
 
 @login_required(login_url='/login')
@@ -155,7 +177,8 @@ def bingo_settings(request):
             return redirect(f'/bingo?id={bingo_sheet.pk}')
     else:
         form = BingoSettingsForm(instance=bingo_sheet)
-    return render(request, 'bingo_settings.html', {'bingo': bingo_sheet, 'form': form})
+    return render(request, 'bingo/bingo_settings.html', {'bingo': bingo_sheet, 'form': form})
+
 
 @login_required(login_url='/login')
 def bingo_delete(request):
@@ -166,4 +189,4 @@ def bingo_delete(request):
     if request.method == 'POST':
         bingo_sheet.delete()
         return redirect('/profile')
-    return render(request, 'bingo_delete.html', {'bingo': bingo_sheet})
+    return render(request, 'bingo/bingo_delete.html', {'bingo': bingo_sheet})
