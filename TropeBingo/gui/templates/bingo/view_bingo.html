@@ -23,7 +23,7 @@
         {% for row in tropes %}
             <tr class="tr-border border-dark">
                 {% for trope in row %}
-                    <td {% if trope in checked_tropes %}style="color: #EFEFEF; background-color: #3e7255; border-bottom-color: black;"{% endif %}>
+                    <td title="{{ trope.description }}" {% if trope in checked_tropes %}style="color: #EFEFEF; background-color: #3e7255; border-bottom-color: black;"{% endif %}>
                         {{ trope.name }}</td>
                 {% endfor %}
             </tr>

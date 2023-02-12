@@ -22,5 +22,7 @@ urlpatterns = [
     path('delete_request', views.delete_request),
     path('view_profile', views.view_profile),
     path('view_bingo', views.view_bingo),
-    path('remove_friend',views.remove_friend)
+    path('remove_friend', views.remove_friend),
+    path('sent', views.sent),
+    path('already_sent', views.already_sent)
 ]

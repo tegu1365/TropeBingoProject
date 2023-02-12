@@ -27,6 +27,7 @@
         <option value="$MODULE_DIR$/gui/templates" />
         <option value="$MODULE_DIR$/gui/templates/bingo" />
         <option value="$MODULE_DIR$/gui/templates/user" />
+        <option value="$MODULE_DIR$/gui/templates/requests" />
       </list>
     </option>
   </component>

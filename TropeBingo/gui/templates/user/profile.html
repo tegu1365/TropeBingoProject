@@ -1,23 +1,39 @@
 {% extends "base.html" %}
 {% block title %}Profile Page{% endblock title %}
 {% block content %}
-    <div class="row my-3 p-3">
-        <h4 class="card-title">{{user.username}}</h4>
-        <p>First name: {{ user.first_name }}</p>
-        <p>Last name: {{ user.last_name }}</p>
-        <a href="user_edit?id={{ user.pk }}">Edit profile</a>
-    </div>
-    <br/>
-    <div>
-    <!--<div class="row my-3 p-3" style="overflow-y: scroll; height:400px;">
-        {}
-    </div>-->
-    Bingo sheets:
-   <div class="list">
-        {% for bingo in BingoSheet %}
-            <!--<div class="list-item">{{ bingo.name }}</div>-->
-             <a href="bingo?id={{ bingo.pk }}" class="list-item">{{ bingo.name }}</a>
-        {% endfor %}
-    </div>
-    </div>
+    <div class="row">
+        <div class="col-6">
+            <h4 class="card-title">{{ user.username }}</h4>
+            <p>First name: {{ user.first_name }}</p>
+            <p>Last name: {{ user.last_name }}</p>
+            <a href="user_edit?id={{ user.pk }}">Edit profile</a>
+        </div>
+        <div class="col-6">
+            <p>Friends:</p>
+            <div style="overflow-y: auto; height:100px;">
+                {% for friend in friends_list %}
+                    <tr>
+                        <td>
+                            <a href="view_profile?id={{ friend.pk }}"
+                               style="font-size: larger">{{ friend.username }}</a>
+                        </td>
+                        <td>
+                            <a href="remove_friend?id={{ friend.pk }}" class="btn btn-light"
+                               style="background-color: #baefd1; float:right ">
+                                Remove</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <br/>
+            Bingo sheets:
+            <div class="list">
+                {% for bingo in BingoSheet %}
+                    <!--<div class="list-item">{{ bingo.name }}</div>-->
+                    <a href="bingo?id={{ bingo.pk }}" class="list-item">{{ bingo.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
 {% endblock content %}

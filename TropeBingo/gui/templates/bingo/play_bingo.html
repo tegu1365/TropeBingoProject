@@ -25,7 +25,7 @@
         {% for row in tropes %}
             <tr>
                 {% for trope in row %}
-                    <td {% if trope in checked_tropes %}class="checked"
+                    <td title="{{ trope.description }}" {% if trope in checked_tropes %}class="checked"
                         style="color: #EFEFEF; background-color: #1d8a4f; border-bottom-color: black;"{% endif %}>
                         <label>
                             <input type="checkbox" name="trope_{{trope.id}}" value="1" {% if trope in checked_tropes %}checked="checked"{% endif %}><span>{{ trope.name }}</span>

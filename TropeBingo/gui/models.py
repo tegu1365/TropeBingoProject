@@ -60,3 +60,4 @@ class Friends(models.Model):
 class FriendRequest(models.Model):
     sender = models.ForeignKey(User, null=True, related_name='sender', on_delete=models.CASCADE)
     receiver = models.ForeignKey(User, null=True, related_name='receiver', on_delete=models.CASCADE)
+    time_stamp = models.DateTimeField(auto_now_add=True)
