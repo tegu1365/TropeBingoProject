@@ -29,16 +29,16 @@ class UserForm(UserChangeForm):
 
 
 class BingoForm(forms.ModelForm):
+    code = None
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['code'].disabled = True
         self.fields['code'].required = False
-        self.fields['checked'].disabled = True
-        self.fields['checked'].required = False
 
     class Meta:
         model = BingoSheet
-        fields = ['name', 'private', 'genre', 'code', 'checked']
+        fields = ['name', 'private', 'genre', 'code']
 
 
 class BingoSettingsForm(forms.ModelForm):

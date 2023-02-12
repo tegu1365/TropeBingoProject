@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Profile Page{% endblock title %}
+{% block content %}
+    <div class="row my-3 p-3">
+        <h4 class="card-title">{{ view_user.username }}</h4>
+        <p>First name: {{ view_user.first_name }}</p>
+        <p>Last name: {{ view_user.last_name }}</p>
+        {% if friends %}
+            <a href="remove_friend?id={{ view_user.pk }}">Remove Friend</a>
+        {% else %}
+            {% if not friend_request %}
+                <a href="sent_request?id={{ view_user.id }}">Send Friend Request</a>
+            {% else %}
+                <a href="accept_request?id={{ friend_request.pk }}">Accept request</a>
+            {% endif %}
+        {% endif %}
+    </div>
+    <br/>
+    <div>
+        Bingo sheets:
+        <div class="list">
+            {% for bingo in BingoSheet %}
+                {% if not bingo.private %}
+                    <a href="view_bingo?id={{ bingo.pk }}" class="list-item">{{ bingo.name }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

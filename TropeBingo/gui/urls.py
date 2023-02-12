@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index),
-    path('login', auth_views.LoginView.as_view()),
+    path('login', auth_views.LoginView.as_view(template_name='user/login.html', success_url='profile')),
     path('logout', auth_views.LogoutView.as_view()),
     path('default', views.default),
     path('register', views.register),
@@ -16,5 +16,11 @@ urlpatterns = [
     path('bingo', views.bingo),
     path('play_bingo', views.play_bingo),
     path('bingo_settings', views.bingo_settings),
-    path('bingo_delete', views.bingo_delete)
+    path('bingo_delete', views.bingo_delete),
+    path('sent_request', views.friend_request),
+    path('accept_request', views.accept_request),
+    path('delete_request', views.delete_request),
+    path('view_profile', views.view_profile),
+    path('view_bingo', views.view_bingo),
+    path('remove_friend',views.remove_friend)
 ]

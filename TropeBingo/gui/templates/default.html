@@ -1,5 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p>History</p>
+    <div class="row">
+        <div class="col-6">
+            <h5>Search for friends</h5>
+        </div>
+        <div class="col-6">
+            <h5>
+                Friend Requests
+            </h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <!--Search Bar-->
+        </div>
+        <div class="col-6">
+            <br/>
+        </div>
+    </div>
+    <div class="container">
+         <div class="col-6">
+            <table class="table">
+                {% for user in users %}
+                    <tr>
+                    {% if not user.is_superuser %}
+                        {% if not user in friends %}
+                        <td>
+                        <a href="view_profile?id={{ user.pk }}" style="font-size: larger">{{ user.username }}</a>
+                        </td>
+                        <td>
+                        <a href="sent_request?id={{ user.pk }}" class="btn btn-light" style="background-color: #baefd1; float:right ">
+                                Send friend request</a>
+                        </td>
+                        {% endif %}
+                    {% endif %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="col-6 float-right">
+            <table class="table">
+                {% for fq in friend_requests %}
+                    <tr>
+                        <td>
+                            <a href="view_profile?id={{ fq.sender.pk }}" style="font-size: larger">{{ fq.sender.username }}</a>
+                        </td>
+                        <td>
+                            <a href="accept_request?id={{ fq.pk }}" class="btn btn-light" style="background-color: #baefd1; float:right ">
+                                Accept</a>
+                        </td>
+                        <td>
+                            <a href="delete_request?id={{ fq.pk }}" class="btn btn-light" style="background-color: #ff4646; float:right ; color: #EFEFEF;">
+                                DELETE</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
 {% endblock %}

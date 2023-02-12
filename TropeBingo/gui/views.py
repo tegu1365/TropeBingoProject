@@ -1,13 +1,13 @@
 import random
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
+from django.contrib.auth import login, get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from base.forms import RegisterUserForm, BingoForm, BingoSettingsForm, UserForm
-from gui.models import BingoSheet, Genre, Trope
+from gui.models import BingoSheet, Genre, Trope, FriendRequest, Friends
 
 
 def index(request):
@@ -34,7 +34,49 @@ def register(request):
 
 @login_required(login_url='/login')
 def default(request):
-    return render(request, 'default.html')
+    all_users = get_user_model().objects.all()
+    all_requests = FriendRequest.objects.filter(receiver=request.user)
+
+    try:
+        friends_list = Friends.objects.get(owner=request.user)
+    except Friends.DoesNotExist:
+        friends_list = None
+
+    context = {
+        'users': all_users,
+        'friend_requests': all_requests,
+        'friends': friends_list.friends.all()
+    }
+
+    return render(request, 'default.html', context)
+
+
+@login_required(login_url='/login')
+def view_profile(request):
+    v_user = User.objects.get(pk=request.GET['id'])
+    try:
+        friends_list = Friends.objects.get(owner=request.user)
+    except Friends.DoesNotExist:
+        friends_list = None
+
+    fr = False
+    if friends_list:
+        friends = friends_list.friends.all()
+        if v_user in friends:
+            fr = True
+
+    try:
+        fq = FriendRequest.objects.get(sender=v_user, receiver=request.user)
+    except FriendRequest.DoesNotExist:
+        fq = None
+
+    context = {
+        'view_user': v_user,
+        'BingoSheet': BingoSheet.objects.filter(owner=v_user),
+        'friend_request': fq,
+        'friends': fr
+    }
+    return render(request, 'user/view_profile.html', context)
 
 
 @login_required(login_url='/login')
@@ -73,10 +115,6 @@ def generate_code(genre):
     return code
 
 
-def generate_checked():
-    return "0" * 25
-
-
 @login_required(login_url='/login')
 def create_bingo(request):
     if request.method == 'POST':
@@ -84,7 +122,6 @@ def create_bingo(request):
         if form.is_valid():
             bingo_sheet = form.save(commit=False)
             bingo_sheet.code = generate_code(bingo_sheet.genre)
-            bingo_sheet.checked = generate_checked()
             bingo_sheet.owner = request.user
             bingo_sheet.save()
             return redirect(f'/bingo?id={bingo_sheet.pk}')
@@ -131,6 +168,24 @@ def bingo(request):
         'bingo': bingo_sheet
     }
     return render(request, 'bingo/bingo.html', context)
+
+
+@login_required(login_url='/login')
+def view_bingo(request):
+    try:
+        bingo_sheet = BingoSheet.objects.get(pk=request.GET['id'])
+    except (KeyError, BingoSheet.DoesNotExist):
+        return HttpResponseNotFound('Invalid link. No ID found.')
+    tropes = get_tropes(bingo_sheet.code)
+    context = {
+        'name': bingo_sheet.name,
+        'private': bingo_sheet.private,
+        'tropes': tropes,
+        'checked_tropes': get_checked(bingo_sheet.checked, bingo_sheet.code),
+        'bingo_done': bingo_sheet.bingo_done,
+        'bingo': bingo_sheet
+    }
+    return render(request, 'bingo/view_bingo.html', context)
 
 
 @login_required(login_url='/login')
@@ -190,3 +245,45 @@ def bingo_delete(request):
         bingo_sheet.delete()
         return redirect('/profile')
     return render(request, 'bingo/bingo_delete.html', {'bingo': bingo_sheet})
+
+
+# ------------------------------------Friends------------------------------------
+@login_required(login_url='/login')
+def friend_request(request):
+    sender = request.user
+    recipient = User.objects.get(id=request.GET['id'])
+    request, created = FriendRequest.objects.get_or_create(sender=sender, receiver=recipient)
+    if created:
+        return HttpResponse('friend request sent')
+    else:
+        return HttpResponse('friend request already sent')
+
+
+@login_required(login_url='/login')
+def accept_request(request):
+    fq = FriendRequest.objects.get(id=request.GET['id'])
+    if fq.receiver == request.user:
+        Friends.make_friend(request.user, fq.sender)
+        Friends.make_friend(fq.sender, fq.receiver)
+        fq.delete()
+        return HttpResponse('friend request accepted')
+    else:
+        return HttpResponse('friend request NOT accepted')
+
+
+@login_required(login_url='/login')
+def delete_request(request):
+    fq = FriendRequest.objects.get(id=request.GET['id'])
+    if fq.receiver == request.user or fq.sender == request.user:
+        fq.delete()
+        return HttpResponse('friend request deleted')
+    else:
+        return HttpResponse('friend request NOT deleted')
+
+
+@login_required(login_url='/login')
+def remove_friend(request):
+    friend = User.objects.get(pk=request.GET['id'])
+    Friends.lose_friend(current_user=request.user, remove_friend=friend)
+    Friends.lose_friend(current_user=friend, remove_friend=request.user)
+    return HttpResponse('User is removed from friends list')
