@@ -2,71 +2,51 @@
 
 {% block content %}
     <div class="container">
-    <div class="row">
-        <div class="col-6">
-            <h5>Search for friends</h5>
+        <div class="row">
+            <div class="col-6">
+                <h5>Search for friends</h5>
+            </div>
+            <div class="col-6">
+                <h5>
+                    Friend Requests
+                </h5>
+            </div>
         </div>
-        <div class="col-6">
-            <h5>
-                Friend Requests
-            </h5>
+        <div class="row">
+            <div class="col-6">
+               <!--Search-->
+                <input type="search" id="search-input">
+            </div>
+            <div class="col-6">
+                <br/>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-6">
-            <!--Search Bar-->
+        <div class="row">
+             <div id="search-results">
+             </div>
+            <div class="col-6" style="overflow-y: auto; height: 250px; max-height:50%">
+                <table class="table">
+                    {% for fq in friend_requests %}
+                        <tr>
+                            <td>
+                                <a href="view_profile?id={{ fq.sender.pk }}"
+                                   style="font-size: larger">{{ fq.sender.username }}</a>
+                                <p style="font-size: x-small; color: #49936a">{{ fq.time_stamp }}</p>
+                            </td>
+                            <td>
+                                <a href="accept_request?id={{ fq.pk }}" class="btn btn-light"
+                                   style="background-color: #baefd1; float:right ">
+                                    Accept</a>
+                            </td>
+                            <td>
+                                <a href="delete_request?id={{ fq.pk }}" class="btn btn-light"
+                                   style="background-color: #ff4646; float:right ; color: #EFEFEF;">
+                                    DELETE</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
         </div>
-        <div class="col-6">
-            <br/>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-6" style="overflow-y: auto; height: 250px; max-height:50%;">
-            <table class="table">
-                {% for user in users %}
-                    <tr>
-                        {% if not user.is_superuser %}
-                        {% if not user == current_user %}
-                            {% if not user in friends and not user in have_fq%}
-                                <td>
-                                    <a href="view_profile?id={{ user.pk }}"
-                                       style="font-size: larger">{{ user.username }}</a>
-                                </td>
-                                <td>
-                                    <a href="sent_request?id={{ user.pk }}" class="btn btn-light"
-                                       style="background-color: #baefd1; float:right ">
-                                        Send friend request</a>
-                                </td>
-                            {% endif %}
-                            {% endif %}
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
-        <div class="col-6" style="overflow-y: auto; height: 250px; max-height:50%">
-            <table class="table">
-                {% for fq in friend_requests %}
-                    <tr>
-                        <td>
-                            <a href="view_profile?id={{ fq.sender.pk }}"
-                               style="font-size: larger">{{ fq.sender.username }}</a>
-                            <p style="font-size: x-small; color: #49936a">{{ fq.time_stamp }}</p>
-                        </td>
-                        <td>
-                            <a href="accept_request?id={{ fq.pk }}" class="btn btn-light"
-                               style="background-color: #baefd1; float:right ">
-                                Accept</a>
-                        </td>
-                        <td>
-                            <a href="delete_request?id={{ fq.pk }}" class="btn btn-light"
-                               style="background-color: #ff4646; float:right ; color: #EFEFEF;">
-                                DELETE</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
     </div>
 {% endblock %}

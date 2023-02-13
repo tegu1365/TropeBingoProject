@@ -1,0 +1,24 @@
+
+    <div class="col-6" style="overflow-y: auto; height: 250px; max-height:50%;">
+                <table class="table">
+                    {% for user in users %}
+                        <tr>
+                            {% if not user.is_superuser %}
+                                {% if not user == current_user %}
+                                        <td>
+                                            <a href="view_profile?id={{ user.pk }}"
+                                               style="font-size: larger">{{ user.username }}</a>
+                                        </td>
+                                     {% if not user in friends and not user in have_fq %}
+                                        <td>
+                                            <a href="sent_request?id={{ user.pk }}" class="btn btn-light"
+                                               style="background-color: #baefd1; float:right ">
+                                                Send friend request</a>
+                                        </td>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>

@@ -14,7 +14,10 @@ from gui.models import BingoSheet, Genre, Trope, FriendRequest, Friends
 
 def index(request):
     """Welcome page."""
-    return render(request, 'index.html')
+    if request.user.is_authenticated:
+        return render(request, 'default.html')
+    else:
+        return render(request, 'index.html')
 
 
 # ------------------------------------USER------------------------------------
@@ -121,6 +124,34 @@ def edit_profile(request):
     else:
         form = UserForm(instance=user)
     return render(request, 'user/user_edit.html', {'user': user, 'form': form})
+
+
+def search(request):
+    query = request.GET.get('q')
+    all_requests = FriendRequest.objects.filter(receiver=request.user)
+
+    try:
+        friends_list = Friends.objects.get(owner=request.user)
+    except Friends.DoesNotExist:
+        friends_list = None
+
+    if friends_list:
+        fr = friends_list.friends.all()
+    else:
+        fr = None
+
+    if query:
+        users = User.objects.filter(username__icontains=query)
+    else:
+        users = User.objects.all()
+
+    context = {
+        'users': users,
+        'friends': fr,
+        'have_fq': [user.sender for user in all_requests],
+        'current_user': User.objects.get(pk=request.user.pk)
+    }
+    return render(request, 'search.html', context)
 
 
 # ------------------------------------BINGO------------------------------------
@@ -315,3 +346,8 @@ def remove_friend(request):
     Friends.lose_friend(current_user=request.user, remove_friend=friend)
     Friends.lose_friend(current_user=friend, remove_friend=request.user)
     return render(request, 'user/remove_friend.html')
+
+
+@login_required(login_url='/login')
+def get_image(request):
+    pass
