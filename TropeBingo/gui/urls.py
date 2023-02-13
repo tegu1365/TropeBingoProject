@@ -25,5 +25,6 @@ urlpatterns = [
     path('remove_friend', views.remove_friend),
     path('sent', views.sent),
     path('already_sent', views.already_sent),
-    path('search', views.search)
+    path('search', views.search),
+    path('get_image', views.get_image)
 ]

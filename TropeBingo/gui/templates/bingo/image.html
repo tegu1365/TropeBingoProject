@@ -1,0 +1,85 @@
+{% load bootstrap5 %}
+{% bootstrap_css %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bingo Sheet</title>
+    <style>
+        #content {
+            width:100%;
+            height: 100%;
+            padding: 20px;
+            background-color: #EFEFEF;
+        }
+
+        .header {
+            font-size: 60px;
+            text-align: center;
+            height: 70px;
+        }
+        .bingo-header {
+            background-color: #baefd1;
+            text-align: center;
+            font-size: 60px;
+            font-weight: bolder;
+            height: 70px;
+        }
+
+        table {
+            width: 500px;
+        }
+
+        td {
+            width: 20%;
+            height: 20%;
+            position: relative;
+            text-align: center;
+        }
+        td .trope {
+            position: center;
+            text-align: center;
+            font-size: 40px;
+        }
+        th {
+            position: center;
+            text-align: center;
+            font-size: 50px;
+        }
+    </style>
+</head>
+<body id="content">
+<div class="row">
+        <h4 class="header">{{ name }}</h4>
+</div>
+<hr/>
+{% if bingo_done %}
+    <h3 class="bingo-header">BINGO</h3>
+{% endif %}
+<div>
+    <div>
+        <table class="table">
+            <thead style="background-color: #baefd1; text-align: center; font-size: xx-large;">
+            <tr>
+                <th scope="col">T</th>
+                <th scope="col">R</th>
+                <th scope="col">O</th>
+                <th scope="col">P</th>
+                <th scope="col">E</th>
+            </tr>
+            </thead>
+            <tbody class="tbody-border border-dark">
+            {% for row in tropes %}
+                <tr class="tr-border border-dark">
+                    {% for trope in row %}
+                        <td  title="{{ trope.description }}"
+                            {% if trope in checked_tropes %}style="color: #EFEFEF; background-color: #3e7255; border-bottom-color: black;"{% endif %}>
+                            <div class ="trope">{{ trope.name }}</div>
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>

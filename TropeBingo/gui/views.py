@@ -1,5 +1,7 @@
+import os
 import random
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -7,6 +9,8 @@ from django.contrib.auth import login, get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.template import loader
+from django.template.loader import get_template
+import imgkit
 
 from base.forms import RegisterUserForm, BingoForm, BingoSettingsForm, UserForm
 from gui.models import BingoSheet, Genre, Trope, FriendRequest, Friends
@@ -127,7 +131,7 @@ def edit_profile(request):
 
 
 def search(request):
-    query = request.GET.get('q')
+    query = request.GET.get('q', '')
     all_requests = FriendRequest.objects.filter(receiver=request.user)
 
     try:
@@ -348,6 +352,40 @@ def remove_friend(request):
     return render(request, 'user/remove_friend.html')
 
 
+
+wkhtml_to_image = os.path.join(
+    settings.BASE_DIR, "wkhtmltoimage.exe")
 @login_required(login_url='/login')
 def get_image(request):
-    pass
+    template_path = 'bingo/image.html'
+    template = get_template(template_path)
+
+    try:
+        bingo_sheet = BingoSheet.objects.get(pk=request.GET['id'])
+    except (KeyError, BingoSheet.DoesNotExist):
+        return HttpResponseNotFound('Invalid link. No ID found.')
+
+    tropes = get_tropes(bingo_sheet.code)
+    context = {
+        'name': bingo_sheet.name,
+        'private': bingo_sheet.private,
+        'tropes': tropes,
+        'checked_tropes': get_checked(bingo_sheet.checked, bingo_sheet.code),
+        'bingo_done': bingo_sheet.bingo_done,
+        'bingo': bingo_sheet
+    }
+    html = template.render(context)
+
+    config = imgkit.config(wkhtmltoimage=wkhtml_to_image, xvfb='/opt/bin/xvfb-run')
+
+    image = imgkit.from_string(html, False, config=config)
+
+    # Generate download
+    response = HttpResponse(image, content_type='image/jpeg')
+
+    response['Content-Disposition'] = 'attachment; filename=image.jpg'
+    # print(response.status_code)
+    if response.status_code != 200:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
+
+    return response
