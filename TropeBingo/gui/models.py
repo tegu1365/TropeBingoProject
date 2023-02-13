@@ -39,7 +39,7 @@ class BingoSheet(models.Model):
 
 
 class Friends(models.Model):
-    friends = models.ManyToManyField(User, null=True)
+    friends = models.ManyToManyField(User)
     owner = models.ForeignKey(User, related_name='owner', on_delete=models.CASCADE, null=True)
 
     @classmethod
