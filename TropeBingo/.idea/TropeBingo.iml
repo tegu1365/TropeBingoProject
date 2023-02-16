@@ -28,6 +28,7 @@
         <option value="$MODULE_DIR$/gui/templates/bingo" />
         <option value="$MODULE_DIR$/gui/templates/user" />
         <option value="$MODULE_DIR$/gui/templates/requests" />
+        <option value="$MODULE_DIR$/gui/templates/personal_tropes" />
       </list>
     </option>
   </component>

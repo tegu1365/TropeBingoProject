@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-6">
+            <h4 class="header">{{ name }}</h4>
+        </div>
+        <!---
+        <div class="col-2">
+            <a href="bingo_settings?id={{ bingo.pk }}" class="btn btn-light"
+               style="background-color: #baefd1; float:right ">Settings</a>
+        </div>
+        <div class="col-2">
+            <a href="bingo_delete?id={{ bingo.pk }}" class="btn btn-light"
+               style="background-color: #ff4646; color: #EFEFEF">DELETE</a>
+        </div>--->
+    </div>
+
+    <div class="row">
+        <p>{{ description }}</p>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <h5>Genres:</h5>
+            <lu>
+                {% for genre in genres %}
+                    <li>{{ genre }}</li>
+                {% endfor %}
+            </lu>
+        </div>
+         <div class="col-6">
+             <h5>Types:</h5>
+            <lu>
+                {% for type in types %}
+                    <li>{{ type }}</li>
+                {% endfor %}
+            </lu>
+        </div>
+    </div>
+{% endblock %}

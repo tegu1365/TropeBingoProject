@@ -2,7 +2,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User
-from gui.models import BingoSheet
+from django.views.generic import CreateView
+
+from gui.models import BingoSheet, PersonalTrope, Genre, Type
 
 
 class RegisterUserForm(UserCreationForm):
@@ -38,10 +40,27 @@ class BingoForm(forms.ModelForm):
 
     class Meta:
         model = BingoSheet
-        fields = ['name', 'private', 'genre', 'code']
+        fields = ['name', 'private', 'genre', 'type', 'code']
 
 
 class BingoSettingsForm(forms.ModelForm):
     class Meta:
         model = BingoSheet
         fields = ['name', 'private']
+
+
+class PersonalTropeForm(forms.ModelForm):
+    name = forms.CharField()
+    description = forms.CharField()
+    genres = forms.ModelMultipleChoiceField(
+        queryset=Genre.objects.all(),
+        widget=forms.CheckboxSelectMultiple
+    )
+    types = forms.ModelMultipleChoiceField(
+        queryset=Type.objects.all(),
+        widget=forms.CheckboxSelectMultiple
+    )
+
+    class Meta:
+        model = PersonalTrope
+        fields = ['name', 'description', 'genres', 'types']

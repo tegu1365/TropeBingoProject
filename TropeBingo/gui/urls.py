@@ -26,5 +26,7 @@ urlpatterns = [
     path('sent', views.sent),
     path('already_sent', views.already_sent),
     path('search', views.search),
-    path('get_image', views.get_image)
+    path('get_image', views.get_image),
+    path('personal_trope', views.personal_trope),
+    path('create_personal_trope', views.create_personal_trope)
 ]

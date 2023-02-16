@@ -1,16 +1,35 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 
-from .models import Trope, BingoSheet, Genre, Friends, FriendRequest
+from .models import Trope, BingoSheet, Genre, Friends, FriendRequest, Type, PersonalTrope
 
 
 class GenreInline(admin.TabularInline):
     model = Trope.genres.through
     extra = 1
 
+class PersonalTropeGenreInline(admin.TabularInline):
+    model = PersonalTrope.genres.through
+    extra = 1
 
 class GenreAdmin(admin.ModelAdmin):
     model = Genre
+    ordering = ('name',)
+    search_fields = ('name',)
+    list_display = ('name',)
+    fields = ('name',)
+
+
+class TypeInline(admin.TabularInline):
+    model = Trope.types.through
+    extra = 1
+
+class PersonalTropeTypeInline(admin.TabularInline):
+    model = PersonalTrope.types.through
+    extra = 1
+
+class TypeAdmin(admin.ModelAdmin):
+    model = Type
     ordering = ('name',)
     search_fields = ('name',)
     list_display = ('name',)
@@ -21,10 +40,10 @@ class TropeAdmin(admin.ModelAdmin):
     model = Trope
     ordering = ('name',)
     search_fields = ('name',)
-    filter_horizontal = ('genres',)
-    list_display = ('name', 'description', 'display_genres')
-    fields = ('name', 'description', 'genres')
-    inlines = [GenreInline]
+    filter_horizontal = ('genres', 'types')
+    list_display = ('name', 'description', 'display_genres', 'display_types')
+    fields = ('name', 'description', 'genres', 'types')
+    inlines = [GenreInline, TypeInline]
 
     def formfield_for_genre(self, db_field, request, **kwargs):
         if db_field.name == 'genres':
@@ -34,15 +53,47 @@ class TropeAdmin(admin.ModelAdmin):
     def display_genres(self, obj):
         return ', '.join([genre.name for genre in obj.genres.all()])
 
-    display_genres.short_description = 'Genres'
+    def formfield_for_type(self, db_field, request, **kwargs):
+        if db_field.name == 'types':
+            kwargs['queryset'] = Type.objects.order_by('name')
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+    def display_types(self, obj):
+        return ', '.join([_type.name for _type in obj.types.all()])
+
+
+class PersonalTropeAdmin(admin.ModelAdmin):
+    model = PersonalTrope
+    ordering = ('name',)
+    search_fields = ('name',)
+    filter_horizontal = ('genres', 'types')
+    list_display = ('name', 'description', 'owner', 'display_genres', 'display_types')
+    fields = ('name', 'description', 'owner', 'genres', 'types')
+    inlines = [PersonalTropeGenreInline, PersonalTropeTypeInline]
+
+    def formfield_for_genre(self, db_field, request, **kwargs):
+        if db_field.name == 'genres':
+            kwargs['queryset'] = Genre.objects.order_by('name')
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+    def display_genres(self, obj):
+        return ', '.join([genre.name for genre in obj.genres.all()])
+
+    def formfield_for_type(self, db_field, request, **kwargs):
+        if db_field.name == 'types':
+            kwargs['queryset'] = Type.objects.order_by('name')
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+    def display_types(self, obj):
+        return ', '.join([_type.name for _type in obj.types.all()])
 
 
 class BingoSheetAdmin(admin.ModelAdmin):
     model = BingoSheet
     ordering = ('name', 'owner', 'genre')
     search_fields = ('name', 'genre')
-    list_display = ('name', 'owner', 'code', 'checked', 'private', 'genre', 'bingo_done')
-    fields = ('name', 'owner', 'code', 'checked', 'private', 'genre', 'bingo_done')
+    list_display = ('name', 'owner', 'code', 'checked', 'private', 'genre', 'type', 'bingo_done', 'last_update', 'date_created')
+    fields = ('name', 'owner', 'code', 'checked', 'private', 'genre', 'type', 'bingo_done')
 
 
 class FriendsAdmin(admin.ModelAdmin):
@@ -71,7 +122,9 @@ class FriendRequestAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Genre, GenreAdmin)
+admin.site.register(Type, TypeAdmin)
 admin.site.register(Trope, TropeAdmin)
+admin.site.register(PersonalTrope, PersonalTropeAdmin)
 admin.site.register(BingoSheet, BingoSheetAdmin)
 admin.site.register(Friends, FriendsAdmin)
-admin.site.register(FriendRequest,FriendRequestAdmin)
+admin.site.register(FriendRequest, FriendRequestAdmin)

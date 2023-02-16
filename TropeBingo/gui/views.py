@@ -1,5 +1,6 @@
 import os
 import random
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -12,8 +13,8 @@ from django.template import loader
 from django.template.loader import get_template
 import imgkit
 
-from base.forms import RegisterUserForm, BingoForm, BingoSettingsForm, UserForm
-from gui.models import BingoSheet, Genre, Trope, FriendRequest, Friends
+from base.forms import RegisterUserForm, BingoForm, BingoSettingsForm, UserForm, PersonalTropeForm
+from gui.models import BingoSheet, Genre, Trope, FriendRequest, Friends, PersonalTrope
 
 
 def index(request):
@@ -160,9 +161,17 @@ def search(request):
 
 # ------------------------------------BINGO------------------------------------
 
-def generate_code(genre):
-    tropes = Trope.objects.filter(genres=genre)
-    random_tropes = random.sample(list(tropes), min(25, len(tropes)))
+def generate_code(genre, _type):
+    """generates code for tropes for now it uses only genre and type distinction and the Trope database,
+    I need to update the coding system to add personal tropes """
+    tropes_by_genre = Trope.objects.filter(genres=genre)
+    tropes_by_type = Trope.objects.filter(types=_type)
+
+    random_tropes_by_genre = random.sample(list(tropes_by_genre), min(25, len(tropes_by_genre)))
+    random_tropes_by_type = random.sample(list(tropes_by_type), min(25, len(tropes_by_type)))
+
+    list_of_tropes = random_tropes_by_genre + random_tropes_by_type
+    random_tropes = random.sample(list_of_tropes, min(25, len(list_of_tropes)))
     code = ''
     for trope in random_tropes:
         code += (str(trope.id) + '|')
@@ -175,7 +184,7 @@ def create_bingo(request):
         form = BingoForm(request.POST)
         if form.is_valid():
             bingo_sheet = form.save(commit=False)
-            bingo_sheet.code = generate_code(bingo_sheet.genre)
+            bingo_sheet.code = generate_code(bingo_sheet.genre, bingo_sheet.type)
             bingo_sheet.owner = request.user
             bingo_sheet.save()
             return redirect(f'/bingo?id={bingo_sheet.pk}')
@@ -256,6 +265,7 @@ def play_bingo(request):
             for trope in row:
                 checked += '1' if request.POST.get(f'trope_{trope.id}') else '0'
         bingo_sheet.checked = checked
+        bingo_sheet.last_update = datetime.now()
         bingo_sheet.save()
         return redirect(f'/bingo?id={bingo_sheet.pk}')
 
@@ -352,9 +362,10 @@ def remove_friend(request):
     return render(request, 'user/remove_friend.html')
 
 
-
 wkhtml_to_image = os.path.join(
     settings.BASE_DIR, "wkhtmltoimage.exe")
+
+
 @login_required(login_url='/login')
 def get_image(request):
     template_path = 'bingo/image.html'
@@ -389,3 +400,36 @@ def get_image(request):
         return HttpResponse('We had some errors <pre>' + html + '</pre>')
 
     return response
+
+
+# ------------------------Personal tropes-------------------
+
+@login_required(login_url='/login')
+def create_personal_trope(request):
+    if request.method == 'POST':
+        form = PersonalTropeForm(request.POST)
+        if form.is_valid():
+            personal_trope = form.save(commit=False)
+            personal_trope.owner = request.user
+            personal_trope.save()
+            form.save_m2m()
+
+            return redirect(f'/personal_trope?id={personal_trope.pk}')
+    else:
+        form = PersonalTropeForm()
+    return render(request, 'personal_tropes/create_personal_trope.html', {'form': form})
+
+
+@login_required(login_url='/login')
+def personal_trope(request):
+    try:
+        personal_trope = PersonalTrope.objects.get(pk=request.GET['id'])
+    except (KeyError, BingoSheet.DoesNotExist):
+        return HttpResponseNotFound('Invalid link. No ID found.')
+    context = {
+        'name': personal_trope.name,
+        'description': personal_trope.description,
+        'genres': personal_trope.genres.all(),
+        'types': personal_trope.types.all()
+    }
+    return render(request, 'personal_tropes/personal_trope.html', context)
