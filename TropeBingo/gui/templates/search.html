@@ -4,11 +4,11 @@
                         <tr>
                             {% if not user.is_superuser %}
                                 {% if not user == current_user %}
+                                    {% if not user in friends and not user in have_fq %}
                                         <td>
                                             <a href="view_profile?id={{ user.pk }}"
                                                style="font-size: larger">{{ user.username }}</a>
                                         </td>
-                                     {% if not user in friends and not user in have_fq %}
                                         <td>
                                             <a href="sent_request?id={{ user.pk }}" class="btn btn-light"
                                                style="background-color: #baefd1; float:right ">

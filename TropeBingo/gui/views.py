@@ -131,6 +131,7 @@ def edit_profile(request):
     return render(request, 'user/user_edit.html', {'user': user, 'form': form})
 
 
+@login_required(login_url='/login')
 def search(request):
     query = request.GET.get('q', '')
     all_requests = FriendRequest.objects.filter(receiver=request.user)
