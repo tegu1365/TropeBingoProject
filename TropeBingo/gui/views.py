@@ -251,6 +251,46 @@ def view_bingo(request):
     return render(request, 'bingo/view_bingo.html', context)
 
 
+wkhtml_to_image = os.path.join(
+    settings.BASE_DIR, "wkhtmltoimage.exe")
+
+
+@login_required(login_url='/login')
+def get_image(request):
+    template_path = 'bingo/image.html'
+    template = get_template(template_path)
+
+    try:
+        bingo_sheet = BingoSheet.objects.get(pk=request.GET['id'])
+    except (KeyError, BingoSheet.DoesNotExist):
+        return HttpResponseNotFound('Invalid link. No ID found.')
+
+    tropes = get_tropes(bingo_sheet.code)
+    context = {
+        'name': bingo_sheet.name,
+        'private': bingo_sheet.private,
+        'tropes': tropes,
+        'checked_tropes': get_checked(bingo_sheet.checked, bingo_sheet.code),
+        'bingo_done': bingo_sheet.bingo_done,
+        'bingo': bingo_sheet
+    }
+    html = template.render(context)
+
+    config = imgkit.config(wkhtmltoimage=wkhtml_to_image, xvfb='/opt/bin/xvfb-run')
+
+    image = imgkit.from_string(html, False, config=config)
+
+    # Generate download
+    response = HttpResponse(image, content_type='image/jpeg')
+
+    response['Content-Disposition'] = 'attachment; filename=image.jpg'
+    # print(response.status_code)
+    if response.status_code != 200:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
+
+    return response
+
+
 @login_required(login_url='/login')
 def play_bingo(request):
     try:
@@ -362,46 +402,6 @@ def remove_friend(request):
     return render(request, 'user/remove_friend.html')
 
 
-wkhtml_to_image = os.path.join(
-    settings.BASE_DIR, "wkhtmltoimage.exe")
-
-
-@login_required(login_url='/login')
-def get_image(request):
-    template_path = 'bingo/image.html'
-    template = get_template(template_path)
-
-    try:
-        bingo_sheet = BingoSheet.objects.get(pk=request.GET['id'])
-    except (KeyError, BingoSheet.DoesNotExist):
-        return HttpResponseNotFound('Invalid link. No ID found.')
-
-    tropes = get_tropes(bingo_sheet.code)
-    context = {
-        'name': bingo_sheet.name,
-        'private': bingo_sheet.private,
-        'tropes': tropes,
-        'checked_tropes': get_checked(bingo_sheet.checked, bingo_sheet.code),
-        'bingo_done': bingo_sheet.bingo_done,
-        'bingo': bingo_sheet
-    }
-    html = template.render(context)
-
-    config = imgkit.config(wkhtmltoimage=wkhtml_to_image, xvfb='/opt/bin/xvfb-run')
-
-    image = imgkit.from_string(html, False, config=config)
-
-    # Generate download
-    response = HttpResponse(image, content_type='image/jpeg')
-
-    response['Content-Disposition'] = 'attachment; filename=image.jpg'
-    # print(response.status_code)
-    if response.status_code != 200:
-        return HttpResponse('We had some errors <pre>' + html + '</pre>')
-
-    return response
-
-
 # ------------------------Personal tropes-------------------
 
 @login_required(login_url='/login')
@@ -424,12 +424,52 @@ def create_personal_trope(request):
 def personal_trope(request):
     try:
         personal_trope = PersonalTrope.objects.get(pk=request.GET['id'])
-    except (KeyError, BingoSheet.DoesNotExist):
+    except (KeyError, PersonalTrope.DoesNotExist):
         return HttpResponseNotFound('Invalid link. No ID found.')
     context = {
         'name': personal_trope.name,
         'description': personal_trope.description,
         'genres': personal_trope.genres.all(),
-        'types': personal_trope.types.all()
+        'types': personal_trope.types.all(),
+        'personal_trope': personal_trope
     }
     return render(request, 'personal_tropes/personal_trope.html', context)
+
+
+def list_personal_tropes(request):
+    context = {
+        'personal_tropes': PersonalTrope.objects.filter(owner=request.user)
+    }
+    return render(request, 'personal_tropes/list_personal_tropes.html', context)
+
+
+def delete_personal_trope(request):
+    try:
+        personal_trope = PersonalTrope.objects.get(pk=request.GET['id'])
+    except (KeyError, PersonalTrope.DoesNotExist):
+        return HttpResponseNotFound('Invalid link. No ID found.')
+    if request.method == 'POST':
+        personal_trope.delete()
+        return redirect(f'/list_personal_tropes')
+    return render(request, 'personal_tropes/deleted.html', {'personal_trope': personal_trope})
+
+
+def edit_personal_trope(request):
+    try:
+        personal_trope = PersonalTrope.objects.get(pk=request.GET['id'])
+    except (KeyError, PersonalTrope.DoesNotExist):
+        return HttpResponseNotFound('Invalid link. No ID found.')
+
+    if request.method == 'POST':
+        form = PersonalTropeForm(request.POST or None, instance=personal_trope)
+        if form.is_valid():
+            personal_trope = form.save(commit=False)
+            personal_trope.save()
+            form.save_m2m()
+
+            return redirect(f'/personal_trope?id={personal_trope.pk}')
+    else:
+        form = PersonalTropeForm(instance=personal_trope)
+    return render(request, 'personal_tropes/edit_personal_trope.html', {'form': form})
+
+# I need to define friend viewing for personal tropes

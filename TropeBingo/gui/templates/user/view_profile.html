@@ -7,6 +7,7 @@
         <p>Last name: {{ view_user.last_name }}</p>
         {% if friends %}
             <a href="remove_friend?id={{ view_user.pk }}">Remove Friend</a>
+             <!--<a href="view_list_personal_tropes?id={{ view_user.pk }}">Personal Tropes</a>-->
         {% else %}
             {% if not friend_request %}
                 <a href="sent_request?id={{ view_user.id }}">Send Friend Request</a>

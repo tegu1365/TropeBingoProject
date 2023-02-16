@@ -28,5 +28,8 @@ urlpatterns = [
     path('search', views.search),
     path('get_image', views.get_image),
     path('personal_trope', views.personal_trope),
-    path('create_personal_trope', views.create_personal_trope)
+    path('create_personal_trope', views.create_personal_trope),
+    path('list_personal_tropes', views.list_personal_tropes),
+    path('edit_personal_trope',views.edit_personal_trope),
+    path('delete_personal_trope',views.delete_personal_trope)
 ]

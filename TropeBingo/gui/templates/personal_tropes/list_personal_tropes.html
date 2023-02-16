@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Profile Page{% endblock title %}
+{% block content %}
+    <div class="row">
+
+    <div class="col-6">
+            <h4 class="header">Personal tropes</h4>
+        </div>
+        <div class="col-3">
+            <a href="create_personal_trope" class="btn btn-light"
+               style="background-color: #baefd1; float:right ">Create Trope</a>
+        </div>
+    </div>
+    <div>
+    <br/>
+    <div class="list">
+        {% for personal_trope in personal_tropes %}
+            <a href="personal_trope?id={{ personal_trope.id }}" class="list-item">{{ personal_trope.name }}</a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

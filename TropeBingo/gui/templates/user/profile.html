@@ -7,6 +7,7 @@
             <p>First name: {{ user.first_name }}</p>
             <p>Last name: {{ user.last_name }}</p>
             <a href="user_edit?id={{ user.pk }}">Edit profile</a>
+            <a href="list_personal_tropes">Personal Tropes</a>
         </div>
         <div class="col-6">
             <p>Friends:</p>
@@ -26,7 +27,7 @@
                 {% endfor %}
             </div>
         </div>
-        <div>
+        <div class="row">
             <br/>
             Bingo sheets:
             <div class="list">

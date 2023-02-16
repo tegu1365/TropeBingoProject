@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+
+{% block content %}
+    <form action="delete_personal_trope?id={{ personal_trope.pk }}" method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to delete {{ personal_trope.name }}?</p>
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <a href="personal_trope?id={{ personal_trope.pk }}" class="btn btn-light" style="background-color: #8edbb3;">Return
+                    to Trope</a>
+                <button type="submit" class="btn btn-light"
+                        style="background-color: #ff4646; color: #EFEFEF">DELETE
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
